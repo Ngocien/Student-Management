@@ -41,7 +41,8 @@ public class Student {
         this.id = id;
     }
 
-    public static Student createStudent(String[] metadata) {
+    public static Student createStudent(String[] metadata)
+    {
         String id = metadata[0];
         String name = metadata[1];
         int age = Integer.parseInt(metadata[2]);

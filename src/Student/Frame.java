@@ -7,25 +7,55 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.AreaAveragingScaleFilter;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Frame implements ActionListener {
     JFrame frame = new JFrame();
-    JComboBox combo = new JComboBox();
-    JComboBox comboBox = new JComboBox();
-    List<Student> students = HandleFile.read_csv("src/data/data.csv");
-    String add_id = "";
+    JComboBox combo_remove = new JComboBox();
+    JComboBox combo_edit = new JComboBox();
+
+    final String file_path = "data.csv";
+    List<Student> students = HandleFile.read_csv(file_path);
+
+    JLabel label_insert = new JLabel("Add a student");
+    JTextField tf_add_name = new JTextField();
+    JTextField tf_add_age = new JTextField();
+    JLabel label_add_name = new JLabel("Name");
+    JLabel label_add_age = new JLabel("Age");
+    JButton btn_add = new JButton("OK");
+
+    JLabel label_change = new JLabel("Edit a student");
+    JTextField tf_edit_name = new JTextField();
+    JTextField tf_edit_age = new JTextField();
+    JLabel label_edit_id = new JLabel("Student ID");
+    JLabel label_edit_name = new JLabel("New name");
+    JLabel label_edit_age = new JLabel("New age");
+    JButton btn_edit = new JButton("OK");
+
+    JLabel label_remove = new JLabel("Remove a student");
+    JButton btn_remove = new JButton("OK");
+    JLabel label_remove_id = new JLabel("Student ID");
+
+    JTable table = new JTable();
+    JScrollPane scrollPane = new JScrollPane(table);
+    DefaultTableModel table_model = new DefaultTableModel();
+
     ArrayList<String> choice = new ArrayList<>();
+
     Frame()
     {
-        action();
         choice = get_all_ID(students);
+        table();
+        ui_add();
+        ui_remove();
+        ui_edit();
         add_func();
-        remove_func(choice);
-        edit_func(choice);
+
+        remove_func();
+        edit_func();
         create_table();
         setFrame();
     }
@@ -38,111 +68,128 @@ public class Frame implements ActionListener {
         frame.add(title);
         frame.setSize(1200, 700);
         frame.setTitle("Menu");
+        frame.setResizable(false);
         frame.getContentPane().setLayout(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
+
+        frame.add(label_insert);
+        frame.add(label_add_name);
+        frame.add(label_add_age);
+        frame.add(tf_add_name);
+        frame.add(tf_add_age);
+        frame.add(btn_add);
+
+        frame.add(label_edit_id);
+        frame.add(label_change);
+        frame.add(label_edit_name);
+        frame.add(label_edit_age);
+        frame.add(tf_edit_name);
+        frame.add(tf_edit_age);
+        frame.add(combo_edit);
+        frame.add(btn_edit);
+
+        frame.add(combo_remove);
+        frame.add(label_remove_id);
+        frame.add(btn_remove);
+        frame.add(label_remove);
+        frame.add(scrollPane);
     }
 
-    public void action()
+    public void ui_add()
     {
+        label_insert.setFont(label_insert.getFont().deriveFont(Font.BOLD, 14f).deriveFont( Font.ITALIC,14f));
+        label_insert.setForeground(Color.RED);
+        label_insert.setBounds(650, 100, 100, 30);
 
-        JLabel insert = new JLabel("Add a student");
-        insert.setFont(insert.getFont().deriveFont(Font.BOLD, 14f).deriveFont( Font.ITALIC,14f));
-        insert.setForeground(Color.RED);
-        JLabel remove = new JLabel("Remove a student");
-        remove.setFont(remove.getFont().deriveFont(Font.BOLD, 14f).deriveFont( Font.ITALIC,14f));
-        remove.setForeground(Color.RED);
-        JLabel change = new JLabel("Edit a student");
-        change.setFont(change.getFont().deriveFont(Font.BOLD, 14f).deriveFont( Font.ITALIC,14f));
-        change.setForeground(Color.RED);
+        label_add_name.setBounds(650, 120,100,30);
+        tf_add_name.setBounds(650,150,100,30);
+        label_add_age.setBounds(780,120,100,30);
+        tf_add_age.setBounds(780,150,50, 30);
+        btn_add.setBounds(850, 150, 70, 30);
 
-
-
-        insert.setBounds(650, 100, 100, 30);
-        remove.setBounds(650, 200, 150, 30);
-        change.setBounds(650,300, 100, 30);
-
-        frame.add(insert);
-        frame.add(remove);
-        frame.add(change);
+        btn_add.setBackground(Color.pink);
+        btn_add.setBorder(new LineBorder(Color.black));
     }
 
-    public String[][] each_row(List<Student> students)
+    public void ui_edit()
     {
-//        ArrayList<String[]> result = new ArrayList<>();
-        String[][] result;
-        result = new String[students.size()][];
-        int count = 0;
+        label_change.setFont(label_change.getFont().deriveFont(Font.BOLD, 14f).deriveFont( Font.ITALIC,14f));
+        label_change.setForeground(Color.RED);
+        label_change.setBounds(650,300, 100, 30);
 
-        for(Student i: students)
-        {
-            String[] temp;
-            temp = new String[]{i.getId(), i.getName(), Integer.toString(i.getAge())};
-            result[count] = temp;
-            count += 1;
-        }
-        return result;
+        combo_edit = new JComboBox(choice.toArray());
+        label_edit_id.setBounds(650,320, 70, 30);
+        combo_edit.setBounds(650,350,100,30);
+        label_edit_name.setBounds(780,320,100, 30);
+        tf_edit_name.setBounds(780,350,100,30);
+        label_edit_age.setBounds(900,320, 100, 30);
+        tf_edit_age.setBounds(900, 350, 50, 30);
+        btn_edit.setBounds(980, 350, 100, 30);
+
+        btn_edit.setBackground(Color.pink);
+        btn_edit.setBorder(new LineBorder(Color.black));
     }
+
+    public void ui_remove()
+    {
+        label_remove.setFont(label_remove.getFont().deriveFont(Font.BOLD, 14f).deriveFont( Font.ITALIC,14f));
+        label_remove.setForeground(Color.RED);
+        label_remove.setBounds(650, 200, 150, 30);
+        combo_remove = new JComboBox(choice.toArray());
+
+        label_remove_id.setBounds(650, 220, 100, 30);
+        combo_remove.setBounds(650, 250, 100, 30);
+        btn_remove.setBounds(780, 250,100, 30);
+
+        btn_remove.setBackground(Color.pink);
+        btn_remove.setBorder(new LineBorder(Color.black));
+    }
+
+    public void table()
+    {
+        table_model.addColumn("ID");
+        table_model.addColumn("Name");
+        table_model.addColumn("Age");
+        table.setModel(table_model);
+        table.setEnabled(false);
+        table.setBounds(50,50, 500, 400);
+        table.revalidate();
+        scrollPane.setBounds(60, 50, 500, 400);
+
+    }
+
 
     public void create_table()
     {
-        String[] column= {"ID", "Name", "Age"};
-        String[][] data= each_row(students);
-        JTable table = new JTable(data, column);
-        table.setEnabled(false);
-
-        table.setBounds(50,50, 500, 400);
-        table.revalidate();
-        JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setBounds(60, 50, 500, 400);
-
-        frame.add(scrollPane);
-
-//        Rectangle rect = table.getCellRect(0, 0, true);
-
+        for(Student i: students)
+        {
+            table_model.addRow(new String[]{i.getId(), i.getName(), Integer.toString(i.getAge())});
+        }
 
     }
 
+
     public void add_func()
     {
-        JTextField name = new JTextField();
-        JTextField age = new JTextField();
-        JLabel insert_name = new JLabel("Name");
-        JLabel insert_age = new JLabel("Age");
-        JButton add = new JButton("OK");
-
-        insert_name.setBounds(650, 120,100,30);
-        name.setBounds(650,150,100,30);
-        insert_age.setBounds(780,120,100,30);
-        age.setBounds(780,150,50, 30);
-        add.setBounds(850, 150, 70, 30);
-
-        add.setBackground(Color.pink);
-        add.setBorder(new LineBorder(Color.black));
-
-        frame.add(insert_name);
-        frame.add(insert_age);
-        frame.add(name);
-        frame.add(age);
-        frame.add(add);
-
-        add.addActionListener(e ->
+        btn_add.addActionListener(e ->
         {
             String id = "SV";
-            String temp = "";
+            String temp = "0";
             for (Student i: students)
-                temp = i.getId().substring(2, i.getId().length());
+                temp = i.getId().substring(2, i.getId().length()); //coi lai
 
             id = id + (Integer.parseInt(temp) +1);
 
-            String n = name.getText();
-            int a = Integer.parseInt(age.getText());
+            String n = tf_add_name.getText();
+            int a = Integer.parseInt(tf_add_age.getText());
             if (a > 0 & a < 100)
             {
                 Student t = new Student(id ,n, a);
+                table_model.addRow(new String[]{id,n,tf_add_age.getText()});
                 students.add(t);
-                combo.addItem(id);
-                comboBox.addItem(id);
+                combo_remove.addItem(id);
+                combo_edit.addItem(id);
                 try
                 {
                     HandleFile.write_file(students);
@@ -150,114 +197,84 @@ public class Frame implements ActionListener {
                     ex.printStackTrace();
                 }
 
-                name.setText("");
-                age.setText("");
+                tf_add_name.setText("");
+                tf_add_age.setText("");
             }
-            students = HandleFile.read_csv("src/data/data.csv");
-            create_table();
-            choice = get_all_ID(students);
+            else
+            {
+                JOptionPane.showMessageDialog(null, "Invalid age", "ALERT", JOptionPane.INFORMATION_MESSAGE);
 
+            }
+            students = HandleFile.read_csv(file_path);
+            choice = get_all_ID(students);
         });
-//        return students;
     }
 
 
     public ArrayList<String> get_all_ID(List<Student> students)
     {
-
         for (Student i: students)
         {
-            assert choice != null;
-            choice.add(i.getId());
+            if (choice != null) {
+                choice.add(i.getId());
+            }
         }
+        Arrays.sort(new ArrayList[]{choice});
         return choice;
     }
 
-    public void remove_func(ArrayList<String> choice)
+    public void remove_func()
     {
-        combo = new JComboBox(choice.toArray());
-        JButton submit = new JButton("OK");
-        JLabel id = new JLabel("Student ID");
-
-        id.setBounds(650, 220, 100, 30);
-        combo.setBounds(650, 250, 100, 30);
-        submit.setBounds(780, 250,100, 30);
-
-        submit.setBackground(Color.pink);
-        submit.setBorder(new LineBorder(Color.black));
-
-        frame.add(combo);
-        frame.add(id);
-        frame.add(submit);
-
-        submit.addActionListener(e->
+        btn_remove.addActionListener(e->
         {
-            String choose = (String)combo.getSelectedItem();
-            combo.removeItem(choose);
-            comboBox.removeItem(choose);
+            String choose = (String) combo_remove.getSelectedItem();
+            combo_remove.removeItem(choose);
+            combo_edit.removeItem(choose);
+            int count = 0;
             for (Student i: students)
             {
                 if (i.getId().equals(choose))
                 {
+                    table_model.removeRow(count);
                     i.setId("");
                     i.setName("");
                     i.setAge(0);
                     break;
                 }
+                count++;
             }
             try {
                 HandleFile.write_file(students);
             } catch (FileNotFoundException ex) {
                 ex.printStackTrace();
             }
-            students = HandleFile.read_csv("src/data/data.csv");
-            create_table();
+            students = HandleFile.read_csv(file_path);
         });
-//        return students;
     }
 
-    public  void edit_func(ArrayList<String> choice)
+    public  void edit_func()
     {
-        JTextField new_name = new JTextField();
-        JTextField new_age = new JTextField();
-        comboBox = new JComboBox(choice.toArray());
-        JLabel id = new JLabel("Student ID");
-        JLabel name = new JLabel("New name");
-        JLabel age = new JLabel("New age");
-
-        JButton submit = new JButton("OK");
-
-        id.setBounds(650,320, 70, 30);
-        comboBox.setBounds(650,350,100,30);
-        name.setBounds(780,320,100, 30);
-        new_name.setBounds(780,350,100,30);
-        age.setBounds(900,320, 100, 30);
-        new_age.setBounds(900, 350, 50, 30);
-        submit.setBounds(980, 350, 100, 30);
-
-        submit.setBackground(Color.pink);
-        submit.setBorder(new LineBorder(Color.black));
-
-        frame.add(id);
-        frame.add(name);
-        frame.add(age);
-        frame.add(new_name);
-        frame.add(new_age);
-        frame.add(comboBox);
-        frame.add(submit);
-
-        submit.addActionListener(e->
+        btn_edit.addActionListener(e->
         {
-            String temp = (String)comboBox.getSelectedItem();
+            String temp = (String) combo_edit.getSelectedItem();
             assert temp != null;
+            int t = Integer.parseInt(tf_edit_age.getText());
+            int count = 0;
             for (Student i : students) {
-                int t = Integer.parseInt(new_age.getText());
-                if (!i.getId().equals(temp) || t <= 0 || t >= 100) {
-                    continue;
+                if (t < 0 || t>100)
+                {
+                    JOptionPane.showMessageDialog(null, "Invalid age", "ALERT", JOptionPane.INFORMATION_MESSAGE);
                 }
-                i.setName(new_name.getText());
-                i.setAge(t);
-                break;
+                if (i.getId().equals(temp))
+                {
+                    i.setName(tf_edit_name.getText());
+                    i.setAge(t);
+                    Arrays.sort(new ArrayList[]{choice});
+                    table_model.removeRow(count);
+                    table_model.addRow(new String[] {i.getId(), i.getName(),Integer.toString(t)});
+                    break;
+                }
+                count++;
             }
             try
             {
@@ -265,12 +282,10 @@ public class Frame implements ActionListener {
             } catch (FileNotFoundException ex) {
                 ex.printStackTrace();
             }
-            new_name.setText("");
-            new_age.setText("");
-            comboBox.setSelectedItem(0);
-            create_table();
+            tf_edit_name.setText("");
+            tf_edit_age.setText("");
+            combo_edit.setSelectedItem(0);
         });
-//        students = HandleFile.read_csv("src/data/data.csv");
     }
 
     @Override
